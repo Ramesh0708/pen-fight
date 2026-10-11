@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pen Fight — Desk 12</title>
+  <meta name="description" content="Flick a ballpoint across a classroom notebook and knock the other pen off the desk.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖊️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Schoolbell&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="classroom">
+    <div class="clock" aria-hidden="true">
+      <span class="hand hour"></span>
+      <span class="hand minute"></span>
+      <span class="pin"></span>
+    </div>
+    <div class="window" aria-hidden="true"></div>
+
+    <header class="board">
+      <p class="board-class">IV · B</p>
+      <h1 class="chalk-title">Pen Fight</h1>
+      <p class="scoreline">
+        <span>You</span>
+        <strong id="you-score">0</strong>
+        <span class="dash" aria-hidden="true">—</span>
+        <strong id="ravi-score">0</strong>
+        <span>Ravi</span>
+      </p>
+      <p id="turn-label" class="turn">Period 4 · Desk 12</p>
+    </header>
+
+    <div class="desk">
+      <div class="ruler" aria-hidden="true"></div>
+      <div class="eraser" aria-hidden="true"></div>
+      <p class="carving" aria-hidden="true">RK + PS</p>
+
+      <div class="sheet">
+        <canvas id="desk-canvas" width="1000" height="640" aria-label="Notebook on the desk. Drag to flick your blue pen."></canvas>
+        <div id="overlay" class="overlay">
+          <div class="note">
+            <h2 id="note-title">Recess rules</h2>
+            <p id="note-body"></p>
+            <button id="note-btn" type="button">Open the notebook</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="desk-foot">
+        <p id="status">Drag across the page to flick.</p>
+        <p>First to 3</p>
+      </div>
+    </div>
+  </div>
+  <script src="js/game.js"></script>
+</body>
+</html>
