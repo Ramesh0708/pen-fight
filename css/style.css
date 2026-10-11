@@ -162,22 +162,53 @@ body {
   opacity: 0.92;
 }
 
-.desk {
+.bench {
   position: relative;
   width: min(1040px, 100%);
-  padding: 26px 28px 18px;
+  padding: 22px 22px 12px;
   background:
     repeating-linear-gradient(
       90deg,
-      rgba(255, 236, 210, 0.07) 0 2px,
-      transparent 2px 9px
+      rgba(255, 226, 190, 0.06) 0 2px,
+      transparent 2px 11px
     ),
-    linear-gradient(180deg, #c48956 0%, #9a6236 42%, #6e4124 100%);
-  border-radius: 12px 12px 18px 18px;
+    linear-gradient(180deg, #b57a45 0%, #8a4e28 55%, #6a3a1e 100%);
+  border-radius: 6px 6px 4px 4px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 230, 200, 0.35),
-    0 16px 0 #5a341c,
-    0 28px 40px rgba(40, 22, 8, 0.28);
+    inset 0 2px 0 rgba(255, 220, 180, 0.28),
+    inset 0 -8px 0 rgba(50, 24, 8, 0.25),
+    0 22px 36px rgba(40, 22, 8, 0.28);
+}
+
+.bench-seat {
+  height: 46px;
+  margin: 16px 34px 0;
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 230, 200, 0.08) 0 2px,
+      transparent 2px 14px
+    ),
+    linear-gradient(180deg, #c49258, #8d552c 70%, #6e4122);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 230, 200, 0.35),
+    0 12px 0 #5c3518;
+}
+
+.bench-legs {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 70px;
+  margin-top: -2px;
+}
+
+.bench-legs span {
+  width: 16px;
+  height: 42px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(90deg, #9aa1a8, #5c636b 45%, #3e444b);
+  box-shadow: 4px 0 0 rgba(40, 24, 8, 0.15);
 }
 
 .ruler {
@@ -220,23 +251,12 @@ body {
 
 .sheet {
   position: relative;
-  border-radius: 2px 8px 4px 2px;
+  border-radius: 2px;
   overflow: hidden;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.65) inset,
-    0 12px 22px rgba(40, 20, 8, 0.22);
-  background: var(--paper);
-}
-
-.sheet::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  border-style: solid;
-  border-width: 0 0 26px 26px;
-  border-color: transparent transparent #e5dccb transparent;
-  pointer-events: none;
+    inset 0 0 0 3px rgba(90, 48, 18, 0.35),
+    0 8px 16px rgba(40, 20, 8, 0.2);
+  background: #a86b3c;
 }
 
 canvas {
@@ -246,7 +266,7 @@ canvas {
   aspect-ratio: 1000 / 640;
   touch-action: none;
   cursor: crosshair;
-  background: var(--paper);
+  background: #a86b3c;
 }
 
 .overlay {
@@ -256,20 +276,23 @@ canvas {
   align-items: center;
   justify-content: center;
   background: rgba(48, 32, 16, 0.18);
-  padding: 16px;
+  padding: 12px;
+  overflow: auto;
 }
 
 .overlay[hidden] { display: none; }
 
 .note {
-  width: min(460px, 100%);
+  width: min(540px, 100%);
+  max-height: 100%;
+  overflow: auto;
   margin: 0;
-  padding: 22px 26px 18px 32px;
+  padding: 22px 22px 18px 30px;
   color: var(--ink);
   background: #f7f2e6;
   box-shadow: 0 16px 36px rgba(30, 16, 6, 0.28);
   position: relative;
-  transform: rotate(-0.5deg);
+  transform: rotate(-0.4deg);
 }
 
 .note::before {
@@ -296,9 +319,17 @@ canvas {
   line-height: 1.35;
 }
 
-.note button {
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: baseline;
+}
+
+.actions button,
+#copy-link {
   font: inherit;
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   color: #9d2c2c;
   background: transparent;
   border: none;
@@ -307,12 +338,77 @@ canvas {
   cursor: pointer;
 }
 
-.note button:hover { background: rgba(180, 50, 50, 0.08); }
+.actions button:hover,
+#copy-link:hover { background: rgba(180, 50, 50, 0.08); }
 
-.note button:focus-visible {
+.actions button:focus-visible,
+#copy-link:focus-visible,
+.name-label + input:focus-visible,
+.pen-picks button:focus-visible {
   outline: 2px solid #2d6adf;
-  outline-offset: 4px;
+  outline-offset: 3px;
 }
+
+.name-label {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+}
+
+#your-name,
+#share-url {
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 1.15rem;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.55);
+  border: none;
+  border-bottom: 1px solid rgba(80, 50, 30, 0.35);
+}
+
+.pick-label {
+  margin: 4px 0;
+  font-size: 1.05rem;
+}
+
+.pen-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.pen-picks button {
+  font: inherit;
+  font-size: 0.98rem;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(70, 42, 20, 0.18);
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.pen-picks button[aria-pressed="true"] {
+  outline: 2px solid #9d2c2c;
+  background: #fff;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 50%;
+  vertical-align: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+#lobby[hidden],
+#share-box[hidden],
+.actions button[hidden] { display: none; }
 
 .desk-foot {
   display: flex;
@@ -333,7 +429,9 @@ canvas {
 @media (max-width: 640px) {
   .classroom { padding: 16px 10px 28px; }
   .board { padding: 12px 12px 10px; border-width: 7px; }
-  .desk { padding: 16px 12px 12px; }
+  .bench { padding: 14px 10px 10px; }
+  .bench-seat { margin: 12px 16px 0; height: 34px; }
+  .bench-legs { display: none; }
   .ruler, .eraser, .carving { display: none; }
   .scoreline { gap: 8px; font-size: 1.2rem; }
   .note p { font-size: 1.12rem; }
