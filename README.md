@@ -12,7 +12,7 @@ Or open `index.html` from this folder.
 
 ## Solo
 
-You sit on your side. Ramesh sits on the other. Pick the pens — Reynolds 045, Trimax, Liquiflo, Cello Gripper, Butterflow, Flair Writometer, Montex Mega Top, or Linc Pentonic — then drag to flick. First to 3.
+You sit on your side. Ramesh sits on the other and brings his own pen. You pick yours — Reynolds 045, Trimax, Liquiflo, Cello Gripper, Butterflow, Flair Writometer, Montex Mega Top, or Linc Pentonic — then drag to flick. First to 3.
 
 ## Two players
 

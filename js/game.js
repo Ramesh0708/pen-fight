@@ -11,43 +11,43 @@ const DRAG = 1.65;
 const ANG_DRAG = 2.7;
 const WINS = 3;
 const BELL_FLICKS = 8;
-const PEN_LEN = 140;
-const PEN_RAD = 9;
+const PEN_LEN = 168;
+const PEN_RAD = 7.5;
 const SAMPLES = 9;
 const PAGES = "https://ramesh0708.github.io/pen-fight/";
 
 const PENS = [
-  penDef("reynolds-045", "Reynolds 045", "#3c7adf", {
-    body: "rgba(170, 206, 255, 0.28)", light: "rgba(255,255,255,0.45)", dark: "rgba(30, 80, 170, 0.25)",
-    cap: "#1e4fae", clip: "#e4e8ee", ink: "rgba(22, 68, 170, 0.45)", clear: true, tube: "#1a4eaf", mark: "045", markColor: "#163e86",
+  penDef("reynolds-045", "Reynolds 045", "#1f5fbe", {
+    style: "045", cap: "#1747a8", clip: "#d5dbe3", tube: "#1a4eaf",
+    ink: "rgba(20, 60, 160, 0.5)", mark: "Reynolds 045", markColor: "#1747a8",
   }),
-  penDef("reynolds-trimax", "Reynolds Trimax", "#1b1b1b", {
-    body: "#1a1a1a", light: "#4a4a4a", dark: "#0c0c0c", cap: "#111", clip: "#c5ccd4", ink: "rgba(20,20,20,0.4)",
-    grip: "#2a2a2a", mark: "TRIMAX", markColor: "#d7dbe2",
+  penDef("reynolds-trimax", "Reynolds Trimax", "#161616", {
+    style: "trimax", cap: "#111", clip: "#cfd5dc", tube: "#111",
+    ink: "rgba(10, 10, 10, 0.45)", mark: "TRIMAX", markColor: "#e8eaee",
   }),
-  penDef("reynolds-liquiflo", "Reynolds Liquiflo", "#14386e", {
-    body: "#16386a", light: "#3d6eae", dark: "#0c2244", cap: "#0e2248", clip: "#d5dae2", ink: "rgba(16, 50, 110, 0.45)",
-    clear: true, tube: "#1a4f96", mark: "LQ", markColor: "#d5e4f8",
+  penDef("reynolds-liquiflo", "Reynolds Liquiflo", "#16386e", {
+    style: "liquiflo", cap: "#0d2858", clip: "#d5dbe3", tube: "#1a4f9a",
+    ink: "rgba(12, 40, 100, 0.5)", mark: "Liquiflo", markColor: "#e7eef8",
   }),
-  penDef("cello-gripper", "Cello Gripper", "#2f74e6", {
-    body: "#2d6fe0", light: "#8eb6f6", dark: "#1a4eae", cap: "#163e86", clip: "#dfe3ea", ink: "rgba(24, 64, 160, 0.4)",
-    grip: "#1a1d24", mark: "GRIP", markColor: "rgba(255,255,255,0.85)",
+  penDef("cello-gripper", "Cello Gripper", "#1f4fae", {
+    style: "gripper", cap: "#1a4e9c", clip: "#e6ebf1", tube: "#1d4eae",
+    ink: "rgba(20, 60, 160, 0.5)", mark: "cello Gripper", markColor: "#1a3f86",
   }),
-  penDef("cello-butterflow", "Cello Butterflow", "#f4f7fb", {
-    body: "#f3f6fb", light: "#ffffff", dark: "#c5d0e0", cap: "#1d4e9e", clip: "#9eb0c8", ink: "rgba(30, 70, 160, 0.35)",
-    grip: "#2a64c4", mark: "BF", markColor: "#1d4e9e",
+  penDef("cello-butterflow", "Cello Butterflow", "#f7f8fb", {
+    style: "butterflow", cap: "#1d4f9e", clip: "#9aafc8", tube: "#2458b0",
+    ink: "rgba(30, 70, 160, 0.4)", mark: "Butterflow", markColor: "#1d4e9e",
   }),
-  penDef("flair-writometer", "Flair Writometer", "#e23b32", {
-    body: "#f4f5f7", light: "#ffffff", dark: "#d5d8de", cap: "#d52828", clip: "#c51616", ink: "rgba(180, 30, 30, 0.4)",
-    mark: "W", markColor: "#c51616",
+  penDef("flair-writometer", "Flair Writometer", "#e10600", {
+    style: "writometer", cap: "#e10600", clip: "#c40000", tube: "#c40000",
+    ink: "rgba(180, 20, 20, 0.45)", mark: "Writometer", markColor: "#d10000",
   }),
-  penDef("montex-megatop", "Montex Mega Top", "#111111", {
-    body: "#1c1c1c", light: "#3a3a3a", dark: "#080808", cap: "#111", clip: "#e0b53a", ink: "rgba(20,20,20,0.4)",
-    grip: "#2c2416", mark: "MEGA", markColor: "#e0b53a",
+  penDef("montex-megatop", "Montex Mega Top", "#111", {
+    style: "megatop", cap: "#111", clip: "#e2b43a", tube: "#111",
+    ink: "rgba(10, 10, 10, 0.45)", mark: "MEGA TOP", markColor: "#e2b43a",
   }),
-  penDef("linc-pentonic", "Linc Pentonic", "#8ea0b8", {
-    body: "#d5dbe3", light: "#f7f8fa", dark: "#9aa6b5", cap: "#24315f", clip: "#c5ccd6", ink: "rgba(30, 50, 120, 0.4)",
-    grip: "#2a3f86", clear: true, tube: "#2a4ea8", mark: "P", markColor: "#24315f",
+  penDef("linc-pentonic", "Linc Pentonic", "#2a3f86", {
+    style: "pentonic", cap: "#24356e", clip: "#2a3f86", tube: "#2450b0",
+    ink: "rgba(30, 55, 140, 0.5)", mark: "PENTONIC", markColor: "#24356e",
   }),
 ];
 
@@ -72,13 +72,11 @@ const noteBody = document.getElementById("note-body");
 const noteBtn = document.getElementById("note-btn");
 const shareBtn = document.getElementById("share-btn");
 const lobbyEl = document.getElementById("lobby");
-const oppPick = document.getElementById("opp-pick");
 const shareBox = document.getElementById("share-box");
 const shareUrl = document.getElementById("share-url");
 const copyLink = document.getElementById("copy-link");
 const yourName = document.getElementById("your-name");
 const yourPens = document.getElementById("your-pens");
-const oppPens = document.getElementById("opp-pens");
 
 let dpr = 1;
 let player;
@@ -90,6 +88,7 @@ let score = { you: 0, ravi: 0 };
 let names = { you: "You", opp: "Ramesh" };
 let myPenId = "reynolds-045";
 let rivalPenId = "cello-gripper";
+let announcePen = false;
 let flickCount = 0;
 let fallClock = null;
 let roundLocked = false;
@@ -287,7 +286,9 @@ function beginPlayer() {
   phase = "aim";
   aiPlan = null;
   setTurn("Your flick", `${names.you}'s flick`);
-  setStatus(`Drag along the bench · ${flicksLeft()} flicks before the bell`);
+  const brought = announcePen ? `${names.opp} brought a ${penById(rivalPenId).label}. ` : "";
+  announcePen = false;
+  setStatus(`${brought}Drag along the bench · ${flicksLeft()} flicks before the bell`);
   sendState(true);
 }
 
@@ -296,7 +297,9 @@ function beginAi() {
   aiPlan = planAiShot();
   aiTimer = 0.62;
   setTurn(`${names.opp}'s flick`, `${names.opp}'s flick`);
-  setStatus(`${names.opp} is lining up his pen…`);
+  const brought = announcePen ? ` He brought a ${penById(rivalPenId).label}.` : "";
+  announcePen = false;
+  setStatus(`${names.opp} is lining up his pen.${brought}`);
   sendState(true);
 }
 
@@ -433,8 +436,17 @@ function finishRound(reason) {
   sendState(true);
 }
 
+function rameshPicks() {
+  const pool = PENS.filter((item) => item.id !== myPenId);
+  rivalPenId = pool[Math.floor(Math.random() * pool.length)].id;
+}
+
 function startMatch() {
-  if (mode === "solo") names.opp = "Ramesh";
+  if (mode === "solo") {
+    names.opp = "Ramesh";
+    rameshPicks();
+    announcePen = true;
+  }
   score = { you: 0, ravi: 0 };
   starter = "ravi";
   updateBoard();
@@ -796,10 +808,105 @@ function drawAim(pen, angle, power) {
   ctx.restore();
 }
 
+function metalCone(tip, rad) {
+  const g = ctx.createLinearGradient(0, -rad, 0, rad);
+  g.addColorStop(0, "#f7f9fb");
+  g.addColorStop(0.45, "#c5ced6");
+  g.addColorStop(1, "#8e99a6");
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(tip - 22, -(rad - 1.4));
+  ctx.lineTo(tip - 5, -1.5);
+  ctx.lineTo(tip - 5, 1.5);
+  ctx.lineTo(tip - 22, rad - 1.4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = "#7d8792";
+  ctx.lineWidth = 0.6;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(tip - 3.4, 0, 1.7, 0, Math.PI * 2);
+  ctx.fillStyle = "#1a1a1a";
+  ctx.fill();
+}
+
+function penClip(x, y, w, h, color) {
+  ctx.fillStyle = color;
+  roundRect(x, y, w, h, 1.2);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(0,0,0,0.25)";
+  ctx.lineWidth = 0.6;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x + w / 2, y + 3.2, 1.15, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(0,0,0,0.28)";
+  ctx.fill();
+}
+
+function ribbedGrip(x, w, rad, color, ribs) {
+  ctx.fillStyle = color;
+  roundRect(x, -rad + 0.2, w, rad * 2 - 0.4, 2.4);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.28)";
+  ctx.lineWidth = 0.8;
+  const n = ribs || 6;
+  for (let i = 1; i < n; i++) {
+    const gx = x + (w * i) / n;
+    ctx.beginPath();
+    ctx.moveTo(gx, -rad + 1.4);
+    ctx.lineTo(gx, rad - 1.4);
+    ctx.stroke();
+  }
+}
+
+function clearTube(x, w, rad, tint, tube) {
+  ctx.fillStyle = tube;
+  roundRect(x + 6, -1.55, Math.max(8, w - 14), 3.1, 1.4);
+  ctx.fill();
+  ctx.fillStyle = tint;
+  roundRect(x, -rad + 0.3, w, rad * 2 - 0.6, rad);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(20, 50, 110, 0.35)";
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(255,255,255,0.75)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + 4, -rad + 2.4);
+  ctx.lineTo(x + w - 4, -rad + 2.4);
+  ctx.stroke();
+}
+
+function solidBarrel(x, w, rad, light, mid, dark) {
+  const g = ctx.createLinearGradient(0, -rad, 0, rad);
+  g.addColorStop(0, light);
+  g.addColorStop(0.42, mid);
+  g.addColorStop(1, dark);
+  ctx.fillStyle = g;
+  roundRect(x, -rad + 0.2, w, rad * 2 - 0.4, rad);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.35)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + 3, -rad + 2.3);
+  ctx.lineTo(x + w - 3, -rad + 2.3);
+  ctx.stroke();
+}
+
+function endCap(x, w, rad, color) {
+  ctx.fillStyle = color;
+  roundRect(x, -rad, w, rad * 2, 2.2);
+  ctx.fill();
+}
+
 function drawPen(pen, ox, oy) {
   const { len, rad, palette } = pen;
+  const tip = len / 2;
+  const tail = -len / 2;
   const fade = pen.falling ? Math.max(0, 1 - pen.fallT * 1.15) : 1;
   const shrink = pen.falling ? Math.max(0.55, 1 - pen.fallT * 0.45) : 1;
+  const style = palette.style;
+
   ctx.save();
   ctx.translate(pen.x + ox, pen.y + oy);
   ctx.rotate(pen.angle);
@@ -807,72 +914,121 @@ function drawPen(pen, ox, oy) {
   ctx.scale(shrink, shrink);
 
   ctx.save();
-  ctx.translate(6, 8);
-  ctx.fillStyle = "rgba(50, 28, 10, 0.22)";
-  roundRect(-len / 2, -rad, len, rad * 2, rad);
+  ctx.translate(5, 7);
+  ctx.fillStyle = "rgba(40, 22, 8, 0.22)";
+  roundRect(tail, -rad, len, rad * 2, rad);
   ctx.fill();
   ctx.restore();
 
-  if (palette.clear) {
-    ctx.fillStyle = palette.tube;
-    roundRect(-len / 2 + 30, -2.3, len * 0.42, 4.6, 2);
+  if (style === "045") {
+    endCap(tail, 18, rad, palette.cap);
+    penClip(tail + 3, -rad - 2.2, 5.2, 34, palette.clip);
+    clearTube(tail + 16, len - 40, rad, "rgba(186, 214, 255, 0.28)", palette.tube);
+    metalCone(tip, rad);
+  } else if (style === "trimax") {
+    endCap(tail, 10, rad - 0.4, "#d5dbe2");
+    ctx.beginPath();
+    ctx.arc(tail + 5, 0, 2.2, 0, Math.PI * 2);
+    ctx.fillStyle = "#9aa3ad";
     ctx.fill();
-    ctx.fillStyle = palette.light;
-    roundRect(-len / 2 + 16, -rad + 1.1, len - 36, rad * 2 - 2.2, rad);
+    solidBarrel(tail + 9, 62, rad, "#3a3a3a", "#161616", "#070707");
+    ctx.fillStyle = "#c5ccd4";
+    roundRect(tail + 70, -rad + 0.4, 3, rad * 2 - 0.8, 1);
     ctx.fill();
-    ctx.strokeStyle = palette.cap;
-    ctx.lineWidth = 1;
-    roundRect(-len / 2 + 16, -rad + 1.1, len - 36, rad * 2 - 2.2, rad);
-    ctx.stroke();
+    ribbedGrip(tail + 74, 52, rad, "#101010", 8);
+    ctx.fillStyle = "rgba(255,255,255,0.16)";
+    for (let i = 0; i < 7; i++) {
+      for (const row of [-3.1, 0, 3.1]) {
+        ctx.beginPath();
+        ctx.arc(tail + 80 + i * 6.4, row, 0.9, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    metalCone(tip, rad);
+  } else if (style === "liquiflo") {
+    endCap(tail, 16, rad, palette.cap);
+    penClip(tail + 3, -rad - 2, 4.6, 30, palette.clip);
+    clearTube(tail + 14, len - 58, rad, "rgba(40, 90, 170, 0.28)", "#0d3f86");
+    ribbedGrip(tip - 46, 24, rad, "#0e2c58", 5);
+    metalCone(tip, rad);
+  } else if (style === "gripper") {
+    endCap(tail, 16, rad, palette.cap);
+    penClip(tail + 3, -rad - 2.1, 4.8, 32, palette.clip);
+    clearTube(tail + 14, len - 70, rad, "rgba(170, 205, 255, 0.34)", palette.tube);
+    ribbedGrip(tip - 54, 32, rad + 0.6, "#1a1c22", 7);
+    metalCone(tip, rad);
+  } else if (style === "butterflow") {
+    endCap(tail, 16, rad, palette.cap);
+    penClip(tail + 3, -rad - 2, 4.6, 28, "#c5d2e4");
+    solidBarrel(tail + 14, len - 66, rad, "#ffffff", "#f4f6fa", "#d5dbe6");
+    ribbedGrip(tip - 50, 28, rad, "#1f57b8", 6);
+    metalCone(tip, rad);
+  } else if (style === "writometer") {
+    endCap(tail, 20, rad, "#e10600");
+    penClip(tail + 4, -rad - 2.3, 5, 40, "#c40000");
+    solidBarrel(tail + 18, len - 46, rad, "#ffffff", "#f6f7f8", "#e1e4e8");
+    ctx.fillStyle = "#e10600";
+    roundRect(tip - 30, -rad + 0.3, 4, rad * 2 - 0.6, 1);
+    ctx.fill();
+    metalCone(tip, rad);
+  } else if (style === "megatop") {
+    endCap(tail, 12, rad, "#1a1a1a");
+    ctx.beginPath();
+    ctx.arc(tail + 6, 0, 2.4, 0, Math.PI * 2);
+    ctx.fillStyle = "#e2b43a";
+    ctx.fill();
+    penClip(tail + 8, -rad - 2.2, 4.4, 36, "#e2b43a");
+    solidBarrel(tail + 12, len - 58, rad, "#2c2c2c", "#141414", "#050505");
+    ctx.fillStyle = "#e2b43a";
+    roundRect(tip - 48, -1.1, 16, 2.2, 1);
+    ctx.fill();
+    ribbedGrip(tip - 46, 22, rad, "#0c0c0c", 5);
+    metalCone(tip, rad);
+  } else if (style === "pentonic") {
+    endCap(tail, 14, rad, "#24356e");
+    penClip(tail + 3, -rad - 2, 4.4, 30, "#2a3f86");
+    clearTube(tail + 12, len - 62, rad, "rgba(210, 220, 230, 0.38)", palette.tube);
+    ribbedGrip(tip - 50, 28, rad + 0.3, "#24356e", 5);
+    ctx.fillStyle = "#d7deea";
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.arc(tip - 44 + i * 6, 0, 1.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    metalCone(tip, rad);
   } else {
-    const barrel = ctx.createLinearGradient(0, -rad, 0, rad);
-    barrel.addColorStop(0, palette.light);
-    barrel.addColorStop(0.45, palette.body);
-    barrel.addColorStop(1, palette.dark);
-    ctx.fillStyle = barrel;
-    roundRect(-len / 2 + 16, -rad + 1.2, len - 36, rad * 2 - 2.4, rad);
-    ctx.fill();
+    solidBarrel(tail + 16, len - 40, rad, "#ddd", "#aaa", "#888");
+    metalCone(tip, rad);
   }
 
-  if (palette.grip) {
-    ctx.fillStyle = palette.grip;
-    roundRect(-len / 2 + 20, -rad + 0.4, 22, rad * 2 - 0.8, 3);
-    ctx.fill();
-  }
+  ctx.restore();
+}
 
-  ctx.fillStyle = palette.cap;
-  roundRect(-len / 2, -rad, 24, rad * 2, 3);
-  ctx.fill();
-  ctx.fillStyle = palette.clip;
-  roundRect(-len / 2 + 6, -rad - 1.5, 7, rad + 4, 2);
-  ctx.fill();
-
-  if (palette.mark) {
-    ctx.fillStyle = palette.markColor || "#fff";
-    ctx.font = "bold 8px sans-serif";
+function drawPenLabels() {
+  for (const pen of pens()) {
+    if (!pen.palette.mark) continue;
+    const fade = pen.falling ? Math.max(0, 1 - pen.fallT * 1.15) : 1;
+    const pos = mode === "guest" ? { x: pen.x, y: H - pen.y } : { x: pen.x, y: pen.y };
+    let angle = mode === "guest" ? pen.angle + Math.PI : pen.angle;
+    const norm = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    if (norm > Math.PI / 2 && norm < (Math.PI * 3) / 2) angle += Math.PI;
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+    ctx.rotate(angle);
+    ctx.globalAlpha = 0.92 * fade;
+    ctx.fillStyle = pen.palette.markColor;
+    ctx.font = 'bold 11px "Patrick Hand", sans-serif';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(palette.mark, 8, 0);
+    ctx.fillText(pen.palette.mark, styleShift(pen.palette.style), 0.5);
+    ctx.restore();
   }
+}
 
-  ctx.beginPath();
-  ctx.moveTo(len / 2 - 26, -rad + 2);
-  ctx.lineTo(len / 2 - 4, 0);
-  ctx.lineTo(len / 2 - 26, rad - 2);
-  ctx.closePath();
-  ctx.fillStyle = "#d5dae1";
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(len / 2 - 6, 0, 2.3, 0, Math.PI * 2);
-  ctx.fillStyle = "#1c1c1c";
-  ctx.fill();
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
-  ctx.lineWidth = 1.3;
-  ctx.beginPath();
-  ctx.moveTo(-len / 2 + 46, -rad + 3);
-  ctx.lineTo(len / 2 - 34, -rad + 3);
-  ctx.stroke();
-  ctx.restore();
+function styleShift(style) {
+  if (style === "gripper" || style === "liquiflo" || style === "pentonic") return -8;
+  if (style === "trimax") return -18;
+  return -2;
 }
 
 function draw() {
@@ -925,6 +1081,11 @@ function draw() {
     ctx.fillStyle = `rgba(70, 42, 18, ${0.4 * t})`;
     ctx.fillRect(speck.x, speck.y, 2.5, 2.5);
   }
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(sx, sy);
+  drawPenLabels();
   ctx.restore();
 
   if (aim.active && aim.power > 0.05) {
@@ -1188,7 +1349,6 @@ shareBtn.addEventListener("click", () => {
   shareBtn.hidden = true;
   noteBtn.hidden = true;
   lobbyEl.hidden = true;
-  oppPick.hidden = true;
   noteTitle.textContent = "Share the bench";
   noteBody.textContent = "Your friend opens the link, picks a pen, and sits down. You stay on this page.";
   setStatus("Creating the link…");
@@ -1218,8 +1378,6 @@ function frame(now) {
 }
 
 renderPicks(yourPens, myPenId, (id) => { myPenId = id; });
-renderPicks(oppPens, rivalPenId, (id) => { rivalPenId = id; });
-if (initialRoom) oppPick.hidden = true;
 
 fit();
 resetPens();
@@ -1236,7 +1394,7 @@ if (initialRoom) {
 } else {
   showNote(
     "Recess on the last bench",
-    "Pick a pen. Flick it up the wood. Knock the other one off the far end. Sides bounce. First to 3. Or share the bench and play a friend.",
+    "Pick your pen. Ramesh brings his own. Flick it up the wood and knock the other one off the far end. Sides bounce. First to 3. Or share the bench and play a friend.",
     "Play Ramesh",
     { lobby: true, share: true }
   );
