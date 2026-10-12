@@ -12,7 +12,7 @@ Or open `index.html` from this folder.
 
 ## Solo
 
-Type your name and choose **Play solo**. Ramesh sits on the other side and brings his own pen. You pick yours — Reynolds 045, Trimax, Liquiflo, Cello Gripper, Butterflow, Flair Writometer, Montex Mega Top, or Linc Pentonic. Pull the pen back, then let go. First to 3.
+Type your name and choose **Play solo**. Ramesh sits on the other side, brings his own pen, and hits back. A soft flick or a miss and he will walk you off the bench. You pick yours — Reynolds 045, Trimax, Liquiflo, Cello Gripper, Butterflow, Flair Writometer, Montex Mega Top, or Linc Pentonic. Pull the pen back, then let go. First to 3.
 
 ## Two players
 

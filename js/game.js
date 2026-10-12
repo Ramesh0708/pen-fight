@@ -5,8 +5,8 @@ const H = 640;
 const LEFT = 34;
 const RIGHT = 966;
 const EDGE = 36;
-const MAX_SPEED = 900;
-const DRAG = 1.65;
+const MAX_SPEED = 650;
+const DRAG = 2.4;
 const ANG_DRAG = 2.7;
 const WINS = 3;
 const BELL_FLICKS = 8;
@@ -144,8 +144,8 @@ function makePen(id, x, y, angle, palette) {
 }
 
 function resetPens() {
-  player = makePen("you", 500, 412, -0.12, penById(myPenId).palette);
-  ravi = makePen("ravi", 468, 198, Math.PI + 0.1, penById(rivalPenId).palette);
+  player = makePen("you", 500, 418, -0.12, penById(myPenId).palette);
+  ravi = makePen("ravi", 500, 236, Math.PI + 0.08, penById(rivalPenId).palette);
   ink = [];
   dust = [];
   fallClock = null;
@@ -311,7 +311,7 @@ function beginPlayer() {
 function beginAi() {
   phase = "ai";
   aiPlan = planAiShot();
-  aiTimer = 0.62;
+  aiTimer = 0.78;
   setTurn(`${names.opp}'s flick`, `${names.opp}'s flick`);
   const brought = announcePen ? ` He brought a ${penById(rivalPenId).label}.` : "";
   announcePen = false;
@@ -332,15 +332,38 @@ function beginOpponent() {
   else beginRemote();
 }
 
+function blendAngle(from, to, t) {
+  const delta = Math.atan2(Math.sin(to - from), Math.cos(to - from));
+  return from + delta * t;
+}
+
 function planAiShot() {
   const dx = player.x - ravi.x;
   const dy = player.y - ravi.y;
   const dist = Math.hypot(dx, dy) || 1;
-  const jitter = (Math.random() - 0.5) * 0.2;
-  const angle = Math.atan2(dy, dx) + jitter;
-  let power = clamp(0.5 + dist / 1100, 0.52, 0.86);
-  if (Math.random() < 0.18) power *= 0.75;
-  return { angle, power };
+  const ux = dx / dist;
+  const uy = dy / dist;
+  const reach = (MAX_SPEED / DRAG) * 0.86;
+  const theirGap = edgeGap(player);
+  const selfGap = edgeGap(ravi);
+  const tip = Math.min(PEN_LEN * 0.34, Math.max(0, reach - dist - 12));
+  let angle = Math.atan2(dy + uy * tip, dx + ux * tip);
+
+  if (dist < 90) return { angle, power: 1 };
+
+  if (dist > reach) {
+    const home = Math.atan2(H * 0.5 - ravi.y, W * 0.5 - ravi.x);
+    return { angle: home, power: 0.6 };
+  }
+
+  if (selfGap < 92 && theirGap > 115) {
+    const home = Math.atan2(H * 0.48 - ravi.y, W * 0.5 - ravi.x);
+    return { angle: blendAngle(angle, home, 0.5), power: 0.5 };
+  }
+
+  const finishing = theirGap < 105;
+  angle += (Math.random() - 0.5) * (finishing ? 0.015 : 0.028);
+  return { angle, power: finishing ? 1 : 0.96 };
 }
 
 function shoot(pen, angle, power) {
@@ -1096,7 +1119,7 @@ function draw() {
     drawAim(local, aim.angle, aim.power);
   }
   if (phase === "ai" && aiPlan && mode !== "guest") {
-    const shown = aiPlan.power * (1 - clamp(aiTimer / 0.62, 0, 1));
+    const shown = aiPlan.power * (1 - clamp(aiTimer / 0.78, 0, 1));
     const back = shown * 16;
     oppShiftX = -Math.cos(aiPlan.angle) * back;
     oppShiftY = -Math.sin(aiPlan.angle) * back;
