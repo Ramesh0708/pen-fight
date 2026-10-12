@@ -12,18 +12,18 @@ Or open `index.html` from this folder.
 
 ## Solo
 
-You sit on your side. Ramesh sits on the other and brings his own pen. You pick yours — Reynolds 045, Trimax, Liquiflo, Cello Gripper, Butterflow, Flair Writometer, Montex Mega Top, or Linc Pentonic — then drag to flick. First to 3.
+Type your name and choose **Play solo**. Ramesh sits on the other side and brings his own pen. You pick yours — Reynolds 045, Trimax, Liquiflo, Cello Gripper, Butterflow, Flair Writometer, Montex Mega Top, or Linc Pentonic. Pull the pen back, then let go. First to 3.
 
 ## Two players
 
-Choose **Share this bench**, copy the link, and send it. Your friend opens it, picks a pen, and sits down. Leave your page open. The match starts when they join.
+Type your name and choose **Play a friend**. Copy the link and send it. Your friend types their name and sits down. Leave your page open. The desk opens for both of you when they join.
 
 Both of you need an internet connection. The link only works while the person who created it still has the game open.
 
 ## Rules
 
 - Drag in the direction you want the pen to travel, then let go.
-- The long sides of the bench bounce. The near and far ends are open.
+- Every edge of the bench is open. Pull the pen back and let go — the further you pull, the further it flies. If it leaves the desk, that pen is out.
 - Knock the other pen off to score. If yours falls, the point is theirs.
 - If both go over, the round is a scratch.
 - After eight flicks with nobody on the floor, the pen closer to an end loses.

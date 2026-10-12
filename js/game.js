@@ -4,8 +4,7 @@ const W = 1000;
 const H = 640;
 const LEFT = 34;
 const RIGHT = 966;
-const FALL_TOP = 18;
-const FALL_BOT = H - 18;
+const EDGE = 36;
 const MAX_SPEED = 900;
 const DRAG = 1.65;
 const ANG_DRAG = 2.7;
@@ -75,6 +74,7 @@ const lobbyEl = document.getElementById("lobby");
 const shareBox = document.getElementById("share-box");
 const shareUrl = document.getElementById("share-url");
 const copyLink = document.getElementById("copy-link");
+const backBtn = document.getElementById("back-btn");
 const yourName = document.getElementById("your-name");
 const yourPens = document.getElementById("your-pens");
 
@@ -107,6 +107,20 @@ let noteState = null;
 let banner = { host: "Period 4 · last bench", guest: "Period 4 · last bench" };
 let peer = null;
 let conn = null;
+let helloTimer = 0;
+let ignoreClose = false;
+const PEER_OPTS = {
+  secure: true,
+  host: "0.peerjs.com",
+  port: 443,
+  path: "/",
+  config: {
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun1.l.google.com:19302" },
+    ],
+  },
+};
 let syncAcc = 0;
 let lastPhaseSent = "";
 
@@ -267,6 +281,7 @@ function showNote(title, body, button, opts) {
   };
   lobbyEl.hidden = !options.lobby;
   shareBtn.hidden = !options.share;
+  backBtn.hidden = !options.back;
   if (!options.keepShare) shareBox.hidden = true;
   overlay.hidden = false;
   if (button) noteBtn.focus();
@@ -276,6 +291,7 @@ function hideNote() {
   noteState = null;
   overlay.hidden = true;
   lobbyEl.hidden = true;
+  backBtn.hidden = true;
 }
 
 function flicksLeft() {
@@ -288,7 +304,7 @@ function beginPlayer() {
   setTurn("Your flick", `${names.you}'s flick`);
   const brought = announcePen ? `${names.opp} brought a ${penById(rivalPenId).label}. ` : "";
   announcePen = false;
-  setStatus(`${brought}Drag along the bench · ${flicksLeft()} flicks before the bell`);
+  setStatus(`${brought}Pull your pen back, then let go · ${flicksLeft()} flicks before the bell`);
   sendState(true);
 }
 
@@ -346,7 +362,18 @@ function shoot(pen, angle, power) {
 }
 
 function edgeGap(pen) {
-  return Math.min(pen.y - FALL_TOP, FALL_BOT - pen.y);
+  return Math.min(pen.x - EDGE, W - EDGE - pen.x, pen.y - EDGE, H - EDGE - pen.y);
+}
+
+function whichEdge(pen) {
+  const gaps = [
+    ["left", pen.x - EDGE],
+    ["right", W - EDGE - pen.x],
+    ["top", pen.y - EDGE],
+    ["bottom", H - EDGE - pen.y],
+  ];
+  gaps.sort((a, b) => a[1] - b[1]);
+  return gaps[0][0];
 }
 
 function finishRound(reason) {
@@ -603,7 +630,11 @@ function limit(pen) {
 
 function integrate(pen, dt) {
   if (pen.falling) {
-    pen.vy += (pen.fallFrom === "top" ? -1400 : 1400) * dt;
+    const push = 1400 * dt;
+    if (pen.fallFrom === "left") pen.vx -= push;
+    else if (pen.fallFrom === "right") pen.vx += push;
+    else if (pen.fallFrom === "top") pen.vy -= push;
+    else pen.vy += push;
     pen.x += pen.vx * dt;
     pen.y += pen.vy * dt;
     pen.angle += pen.va * dt;
@@ -625,10 +656,7 @@ function physics(dt) {
   let impact = 0;
   for (let s = 0; s < steps; s++) {
     for (const pen of pens()) integrate(pen, h);
-    for (const pen of pens()) {
-      collideWalls(pen);
-      limit(pen);
-    }
+    for (const pen of pens()) limit(pen);
     for (let n = 0; n < 4; n++) impact = Math.max(impact, collidePair(player, ravi));
     for (const pen of pens()) limit(pen);
   }
@@ -650,9 +678,9 @@ function markFalls() {
   if (phase !== "watch" && phase !== "ai" && phase !== "aim") return;
   for (const pen of pens()) {
     if (pen.falling) continue;
-    if (pen.y < FALL_TOP || pen.y > FALL_BOT) {
+    if (edgeGap(pen) < 0) {
       pen.falling = true;
-      pen.fallFrom = pen.y < FALL_TOP ? "top" : "bottom";
+      pen.fallFrom = whichEdge(pen);
       pen.fallT = 0;
       sounds.clatter();
       shakeMag = Math.max(shakeMag, 5);
@@ -1104,9 +1132,10 @@ function updateAim(e) {
   const pen = mine();
   const dx = pos.x - pen.x;
   const dy = pos.y - pen.y;
+  const dist = Math.hypot(dx, dy);
   aim.active = true;
-  aim.angle = Math.atan2(dy, dx);
-  aim.power = clamp((Math.hypot(dx, dy) - 18) / 190, 0, 1);
+  aim.angle = Math.atan2(-dy, -dx);
+  aim.power = clamp((dist - 12) / 170, 0, 1);
 }
 
 function endDrag() {
@@ -1127,16 +1156,19 @@ function endDrag() {
 
 function readLobby() {
   const typed = yourName.value.trim().slice(0, 16);
-  if (typed) names.you = typed;
+  names.you = typed;
+  if (!typed) {
+    setStatus("Write your name first. Ramesh is on the other side.");
+    yourName.focus();
+    return false;
+  }
+  return true;
 }
 
 function shareOrigin() {
   const host = location.hostname;
   if (location.protocol === "file:" || host === "localhost" || host === "127.0.0.1") return PAGES;
-  const url = new URL(location.href);
-  url.search = "";
-  url.hash = "";
-  return url.toString();
+  return new URL("./", location.href).href;
 }
 
 function roomLink(id) {
@@ -1229,46 +1261,96 @@ function applyState(msg) {
   }
 }
 
-function bindConn(c) {
-  conn = c;
-  c.on("data", (msg) => {
-    if (!msg || !msg.type) return;
-    if (msg.type === "hello" && mode === "host") {
-      names.opp = String(msg.name || "Friend").slice(0, 16) || "Friend";
-      if (msg.pen) rivalPenId = msg.pen;
-      updateBoard();
-      shareBox.hidden = true;
+function sendHello() {
+  send({ type: "hello", name: names.you, pen: myPenId });
+}
+
+function onNet(msg) {
+  if (!msg || !msg.type) return;
+  if (msg.type === "ask" && mode === "guest") {
+    sendHello();
+    return;
+  }
+  if (msg.type === "hello" && mode === "host") {
+    names.opp = String(msg.name || "Friend").slice(0, 16) || "Friend";
+    if (msg.pen) rivalPenId = msg.pen;
+    updateBoard();
+    if (phase === "waiting" || phase === "menu") {
+      clearInterval(helloTimer);
       hideNote();
       startMatch();
-    } else if (msg.type === "flick" && mode === "host" && phase === "remote") {
-      shoot(ravi, msg.angle, msg.power);
-    } else if (msg.type === "advance" && mode === "host") {
-      if (phase === "match") startMatch();
-      else if (phase === "round") nextRound();
-    } else if (msg.type === "state" && mode === "guest") {
-      applyState(msg);
+    } else {
+      sendState(true);
+    }
+    return;
+  }
+  if (msg.type === "flick" && mode === "host" && phase === "remote") {
+    shoot(ravi, msg.angle, msg.power);
+    return;
+  }
+  if (msg.type === "advance" && mode === "host") {
+    if (phase === "match") startMatch();
+    else if (phase === "round") nextRound();
+    return;
+  }
+  if (msg.type === "state" && mode === "guest") {
+    clearInterval(helloTimer);
+    applyState(msg);
+  }
+}
+
+function bindConn(c) {
+  conn = c;
+  c.on("data", onNet);
+  c.on("open", () => {
+    ignoreClose = false;
+    if (mode === "host") {
+      setStatus("They're here. Opening the desk…");
+      try { c.send({ type: "ask" }); } catch (err) { /* channel still opening */ }
+    } else {
+      sendHello();
     }
   });
-  c.on("close", () => setStatus("They left the bench."));
+  c.on("close", () => {
+    if (ignoreClose || mode !== "host") return;
+    setStatus("They left the desk.");
+    showMenu();
+  });
+}
+
+function destroyPeer() {
+  ignoreClose = true;
+  clearInterval(helloTimer);
+  try { if (conn) conn.close(); } catch (err) { /* already gone */ }
+  try { if (peer) peer.destroy(); } catch (err) { /* already gone */ }
+  conn = null;
+  peer = null;
 }
 
 function hostMatch(roomId) {
   if (typeof Peer === "undefined") {
-    setStatus("Sharing needs an internet connection.");
+    setStatus("Playing a friend needs an internet connection.");
+    showMenu();
     return;
   }
+  destroyPeer();
   mode = "host";
-  peer = new Peer(roomId);
-  peer.on("open", () => setStatus("Link is ready. Leave this page open."));
-  peer.on("connection", (c) => {
-    bindConn(c);
-    c.on("open", () => setStatus(`${names.opp} is sitting down…`));
+  phase = "waiting";
+  peer = new Peer(roomId, PEER_OPTS);
+  let deskOpen = false;
+  peer.on("open", () => {
+    deskOpen = true;
+    setStatus("Desk is open. Send the link, or start when they are in.");
   });
+  peer.on("connection", (c) => bindConn(c));
   peer.on("error", (err) => {
     const taken = err && err.type === "unavailable-id";
-    noteBtn.hidden = false;
-    shareBtn.hidden = false;
-    setStatus(taken ? "That bench code is taken. Try sharing again." : "Could not open the bench. Check your connection.");
+    if (deskOpen && !taken) {
+      setStatus("The link is still up. Stay on this page.");
+      return;
+    }
+    setStatus(taken ? "That desk code is taken. Try again." : "Could not open the desk. Check your connection and try again.");
+    showMenu();
   });
 }
 
@@ -1277,20 +1359,25 @@ function joinMatch() {
     setStatus("Joining needs an internet connection.");
     return;
   }
+  if (!readLobby()) return;
+  destroyPeer();
   mode = "guest";
-  readLobby();
-  showNote("Pull the bench in", `Waiting for the other end of the bench…`, "", { lobby: false, share: false });
-  setStatus("Finding the bench…");
-  peer = new Peer();
+  phase = "joining";
+  showNote("Sitting down", "Looking for their desk. Keep this page open.", "", { lobby: false, share: false, back: true });
+  setStatus("Finding the desk…");
+  peer = new Peer(undefined, PEER_OPTS);
   peer.on("open", () => {
-    conn = peer.connect(initialRoom, { reliable: true });
-    bindConn(conn);
-    conn.on("open", () => {
-      send({ type: "hello", name: names.you, pen: myPenId });
-      setStatus("You sat down. Their flick or yours — watch the board.");
-    });
+    const link = peer.connect(initialRoom, { reliable: true });
+    bindConn(link);
+    helloTimer = setInterval(() => {
+      if (phase === "joining") sendHello();
+    }, 800);
   });
-  peer.on("error", () => setStatus("That bench is not open. Ask them to share a new link."));
+  peer.on("error", () => {
+    clearInterval(helloTimer);
+    setStatus("That desk is not open. Ask them to send a new link.");
+    showJoin();
+  });
 }
 
 function renderPicks(root, current, choose) {
@@ -1320,39 +1407,76 @@ canvas.addEventListener("pointermove", (e) => { if (dragging) updateAim(e); });
 canvas.addEventListener("pointerup", endDrag);
 canvas.addEventListener("pointercancel", endDrag);
 
+function showMenu() {
+  destroyPeer();
+  mode = "solo";
+  phase = "menu";
+  names.opp = "Ramesh";
+  updateBoard();
+  showNote(
+    "Pick your fight",
+    "Type your name. Play solo and Ramesh sits across the bench. Or open a desk and send the link to a friend. Pull the pen back, then let go.",
+    "Play solo",
+    { lobby: true, share: true }
+  );
+  shareBtn.textContent = "Play a friend";
+}
+
+function showJoin() {
+  mode = "guest";
+  phase = "menu";
+  showNote(
+    "Someone saved you a seat",
+    "Type your name, pick your pen, and sit down. Pull the pen back, then let go. The further you pull, the further it goes.",
+    "Sit down",
+    { lobby: true, share: false }
+  );
+}
+
 noteBtn.addEventListener("click", () => {
   try { audio(); } catch (err) { /* ignore */ }
-  readLobby();
-  if (initialRoom && mode !== "host") {
+  if (initialRoom && mode !== "host" && phase === "menu") {
     joinMatch();
     return;
   }
-  if (mode === "guest") {
+  if (mode === "guest" && (phase === "round" || phase === "match")) {
     send({ type: "advance" });
     return;
   }
+  if (!readLobby()) return;
+  if (mode === "host" && phase === "waiting") {
+    hideNote();
+    startMatch();
+    return;
+  }
   if (phase === "menu" || phase === "match") {
-    mode = mode === "host" ? "host" : "solo";
-    if (mode === "solo") names.opp = "Ramesh";
+    if (mode !== "host") {
+      mode = "solo";
+      names.opp = "Ramesh";
+    }
     startMatch();
   } else nextRound();
 });
 
 shareBtn.addEventListener("click", () => {
   try { audio(); } catch (err) { /* ignore */ }
-  readLobby();
-  names.opp = "Friend";
+  if (!readLobby()) return;
   const id = `bench${Math.random().toString(36).slice(2, 8)}`;
-  const link = roomLink(id);
-  shareUrl.value = link;
+  shareUrl.value = roomLink(id);
   shareBox.hidden = false;
-  shareBtn.hidden = true;
-  noteBtn.hidden = true;
-  lobbyEl.hidden = true;
-  noteTitle.textContent = "Share the bench";
-  noteBody.textContent = "Your friend opens the link, picks a pen, and sits down. You stay on this page.";
-  setStatus("Creating the link…");
+  showNote(
+    "Your desk is open",
+    "Send the link. When they sit down the fight starts on its own. If it does not, press start. Stay on this page.",
+    "Start the fight",
+    { lobby: false, share: false, keepShare: true, back: true }
+  );
+  setStatus("Opening the desk…");
   hostMatch(id);
+});
+
+backBtn.addEventListener("click", () => {
+  if (initialRoom && mode !== "host") showJoin();
+  else showMenu();
 });
 
 copyLink.addEventListener("click", async () => {
@@ -1383,20 +1507,9 @@ fit();
 resetPens();
 updateBoard();
 setTurn("Period 4 · last bench");
-setStatus(initialRoom ? "A seat is saved on this bench." : "The bench is empty. Recess just started.");
-if (initialRoom) {
-  showNote(
-    "Someone saved you a seat",
-    "Pick your pen and sit down. You will face them across the bench. First to knock a pen off 3 times wins.",
-    "Sit down",
-    { lobby: true, share: false }
-  );
-} else {
-  showNote(
-    "Recess on the last bench",
-    "Pick your pen. Ramesh brings his own. Flick it up the wood and knock the other one off the far end. Sides bounce. First to 3. Or share the bench and play a friend.",
-    "Play Ramesh",
-    { lobby: true, share: true }
-  );
-}
+names.opp = "Ramesh";
+updateBoard();
+setStatus(initialRoom ? "A seat is saved on this desk." : "The bench is empty. Recess just started.");
+if (initialRoom) showJoin();
+else showMenu();
 requestAnimationFrame(frame);
